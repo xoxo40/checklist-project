@@ -17,12 +17,15 @@ class TaskResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-check-circle';
 
-    // Correction de la signature de la méthode `form` en utilisant Filament\Forms\Form
     public static function form(Forms\Form $form): Forms\Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('checklist_description')
+                Forms\Components\TextInput::make('checklist_id')
+                    ->label('ID de la Checklist')
+                    ->required(), // Changer ceci selon votre logique
+
+                Forms\Components\TextInput::make('description')
                     ->label('Titre de la Tâche')
                     ->required(),
 
@@ -37,7 +40,11 @@ class TaskResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('checklist_description')
+                Tables\Columns\TextColumn::make('checklist_id')
+                    ->label('ID de la Checklist')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('description')
                     ->label('Titre de la Tâche')
                     ->sortable()
                     ->searchable(),
