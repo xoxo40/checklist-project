@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('user_tasks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('task_id')->constrained('tasks'); // Foreign key vers tasks(id)
-            $table->foreignId('user_id')->constrained('users'); // Foreign key vers users(id)
-            $table->boolean('is_completed')->default(false); // tinyint(1)
+            $table->string('name_employee',255);
+            $table->text('task_details');
+            $table->string('is_completed')->default('non_commence')->change();
+            $table->date('date');
+            $table->text('commentaire')->nullable()->change();
             $table->timestamps();
         });
     }
@@ -25,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_checklists');
+        Schema::dropIfExists('user_tasks');
     }
 };

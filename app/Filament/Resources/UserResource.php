@@ -20,7 +20,7 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static ?string $navigationIcon = 'heroicon-o-user-plus';
 
     public static function form(Form $form): Form
     {
@@ -48,8 +48,8 @@ class UserResource extends Resource
 
                 Forms\Components\Select::make('role')
                 ->options([
-                    'utilisateur' => 'Utilisateur',
-                    'administrateur' => 'Administrateur',
+                    
+                    'administrateur' => 'admin',
                 ])
                 ->required(),
 

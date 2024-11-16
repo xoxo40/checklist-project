@@ -15,7 +15,7 @@ return new class extends Migration
         $table->id();
         $table->string('title', 255);
         $table->text('description');
-        $table->foreignId('created_by')->constrained('users'); // Foreign key vers users(id)
+        $table->foreignId('created_by')->constrained('employee'); // Foreign key vers users(id)
         $table->timestamps();
     });
 }

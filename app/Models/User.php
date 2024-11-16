@@ -46,4 +46,18 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+
+    public function canAccessPanel(Panel $panel): bool
+    {    
+
+        $user = Auth::user();
+        $roles = $user -> getRoleNames();
+
+        if($panel->getId() === 'admin' && $roles->contains('admin')){
+
+            return true;
+        }
+        return str_ends_with($this->email, '@yourdomain.com') && $this->hasVerifiedEmail();
+    }
 }

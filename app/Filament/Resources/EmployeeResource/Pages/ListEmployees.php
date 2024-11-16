@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\TasksResource\Pages;
+namespace App\Filament\Resources\EmployeeResource\Pages;
 
-use App\Filament\Resources\TasksResource;
+use App\Filament\Resources\EmployeeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListTasks extends ListRecords
+class ListEmployees extends ListRecords
 {
-    protected static string $resource = TasksResource::class;
+    protected static string $resource = EmployeeResource::class;
 
     protected function getHeaderActions(): array
     {

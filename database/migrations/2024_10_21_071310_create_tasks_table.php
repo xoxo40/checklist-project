@@ -9,16 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
+            $table->string('name_employee'); // Utiliser string() au lieu de varchar()
             $table->foreignId('checklist_id')->constrained('checklists'); // Foreign key vers checklists(id)
-            $table->text('description');
+            $table->string('task_details');
+            $table->date('date');
             $table->timestamps();
         });
     }
-    
 
     /**
      * Reverse the migrations.

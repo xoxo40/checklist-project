@@ -10,7 +10,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\Action;
-use Illuminate\Database\Eloquent\Builder;
 
 class ChecklistResource extends Resource
 {
@@ -29,40 +28,28 @@ class ChecklistResource extends Resource
                     ->label('Description')
                     ->required(),
                 Forms\Components\Select::make('created_by')
-                    ->relationship('user', 'name')
-                    ->label('Created By')
+                    ->relationship('employee', 'username') // Utilisation de 'employe' pour le modèle
+                    ->label('assigned to')
                     ->required(),
             ]);
     }
 
     public static function table(Table $table): Table
     {
-       return $table
-        ->columns([
-            TextColumn::make('title')
-                ->label('Title')
-                ->formatStateUsing(fn (string $state): string => strtoupper($state)), // Majuscule pour le titre
-        ])
-        ->actions([
-            Action::make('view')
-                ->label('View Details')
-                ->icon('heroicon-o-eye')
-                ->action(fn (Checklist $record) => [
-                    'type' => 'alert',
-                    'message' => "Title: {$record->title}\nDescription: {$record->description}\nCreated By: {$record->user->name}", // Détails de la checklist
-                ])
-                ->modalHeading('Checklist Details') // Titre de l'alerte (si vous utilisez un modal plutôt qu'une alerte)
-                ->modalContent(fn (Checklist $record) => view('your-view-name', ['record' => $record])), // Utilisez un modal avec un contenu
-            Action::make('edit')
-                ->label('Edit')
-                ->icon('heroicon-o-pencil')
-                ->url(fn (Checklist $record): string => ChecklistResource::getUrl('edit', ['record' => $record->getKey()])), // Lien vers la page d'édition
-            Action::make('delete')
-                ->label('Delete')
-                ->icon('heroicon-o-trash')
-                ->action(fn (Checklist $record) => $record->delete()) // Action de suppression
-                ->requiresConfirmation(), // Demande de confirmation avant suppression
-        ]);
+        return $table
+            ->columns([
+                TextColumn::make('title')
+                    ->label('Title')
+                    ->formatStateUsing(fn (string $state): string => strtoupper($state)), // Majuscule pour le titre
+                TextColumn::make('employee.username') // Afficher le nom d'utilisateur de l'employé
+                    ->label('assigned to')
+                    ->sortable(), // Permet le tri
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ]);
     }
 
     public static function getPages(): array
@@ -71,7 +58,7 @@ class ChecklistResource extends Resource
             'index' => Pages\ListChecklists::route('/'),
             'create' => Pages\CreateChecklist::route('/create'),
             'edit' => Pages\EditChecklist::route('/{record}/edit'),
-            'view' => Pages\ViewChecklist::route('/{record}'), // Route pour voir les détails
+            
         ];
     }
 }
