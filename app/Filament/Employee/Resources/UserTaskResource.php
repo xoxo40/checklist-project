@@ -24,10 +24,15 @@ class UserTaskResource extends Resource
     {
         return $form->schema([
             Forms\Components\Select::make('task_id')
-                ->label('Tâche')
-                ->relationship('task', 'checklist_id')
-                ->required()
-                ->reactive()
+            ->label('Tâche')
+            ->options(function () {
+                return Task::with('checklist')
+                    ->get()
+                    ->pluck('checklist.description', 'id');
+            })
+            ->required()
+            ->reactive()
+            // ... rest of your existing code
                 ->afterStateUpdated(function (callable $get, callable $set) {
                     $taskId = $get('task_id');
                     $task = Task::find($taskId);
@@ -140,10 +145,39 @@ class UserTaskResource extends Resource
                 ->label('Date de la Tâche')
                 ->required(),
 
-            Forms\Components\Textarea::make('commentaire')
-                ->label('Commentaire')
-                ->maxLength(255)
-                ->nullable(),
+                Forms\Components\Textarea::make('commentaire')
+    ->label('Commentaire')
+    ->maxLength(255)
+    ->nullable()
+    ->afterStateUpdated(function ($state, callable $set, $record) {
+        if ($state && $record) {
+            try {
+                // Vérifiez que l'enregistrement a bien un ID avant de créer une notification
+                if (!$record->id) {
+                    throw new \Exception('Impossible de créer une notification : l\'enregistrement n\'a pas d\'ID.');
+                }
+
+                // Création de la notification en utilisant le modèle personnalisé
+                \App\Models\Notification::create([
+                    'user_task_id' => $record->id, // Relation avec la tâche utilisateur
+                    'message' => 'Nouveau commentaire ajouté : ' . $state, // Message
+                    'is_read' => false,
+                    'is_processed' => false,
+                ]);
+
+            } catch (\Exception $e) {
+                \Log::error('Erreur lors de l\'insertion de la notification : ' . $e->getMessage());
+                // Lever une exception compréhensible pour l'utilisateur
+                throw \Filament\Exceptions\HaltException::make()
+                    ->withMessage('Erreur lors de la création de la notification : ' . $e->getMessage());
+            }
+        }
+    }),
+
+
+            
+
+                
         ]);
     }
 
@@ -151,7 +185,7 @@ class UserTaskResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('task.task_id')
+                Tables\Columns\TextColumn::make('task.checklist.description')
                     ->label('Tâche')
                     ->sortable()
                     ->searchable(),
@@ -176,8 +210,14 @@ class UserTaskResource extends Resource
                     Tables\Columns\BadgeColumn::make('is_completed')
     ->label('Statut')
     ->sortable()
-    ->getStateUsing(function ($record) {
-        switch ($record->is_completed) {
+    ->icons([
+        'heroicon-o-clock' => fn ($state) => $state === 'non_commence',
+        'heroicon-o-arrow-path' => fn ($state) => $state === 'en_cours',
+        'heroicon-o-check-circle' => fn ($state) => $state === 'complet',
+        'heroicon-o-question-mark-circle' => fn ($state) => $state === null,
+    ])
+    ->formatStateUsing(function ($state) {
+        switch ($state) {
             case 'non_commence':
                 return 'Non commencé';
             case 'en_cours':
@@ -188,12 +228,14 @@ class UserTaskResource extends Resource
                 return 'Inconnu';
         }
     })
-    ->colors([
-        'non_commence' => 'info',    // Bleu
-        'en_cours' => 'warning',     // Jaune
-        'complet' => 'success',      // Vert
-    ]),
-    
+    ->color(function ($state) {
+        return match ($state) {
+            'non_commence' => 'info',
+            'en_cours' => 'warning',
+            'complet' => 'success',
+            default => 'gray',
+        };
+    }),
 
                 
 

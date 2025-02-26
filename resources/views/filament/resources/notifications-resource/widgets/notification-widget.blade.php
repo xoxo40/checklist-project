@@ -1,24 +1,19 @@
-<x-filament-widgets::widget>
-    <x-filament::section>
-    <div class="relative">
-    <button>
-        <x-heroicon-o-bell class="w-6 h-6 text-gray-500" />
-        @if($notifications->count() > 0)
-            <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
-                {{ $notifications->count() }}
-            </span>
-        @endif
-    </button>
-
-    <div class="mt-2 bg-white border rounded shadow-lg">
-        @foreach ($notifications as $notification)
-            <div class="p-2 border-b">
-                <strong>{{ $notification->data['title'] ?? 'Notification' }}</strong>
-                <p>{{ $notification->data['message'] ?? 'Nouvelle notification' }}</p>
-            </div>
-        @endforeach
-    </div>
+<div>
+    <h2 class="text-lg font-bold">Notifications</h2>
+    @forelse ($this->getNotifications() as $notification)
+        <div class="p-4 border rounded-lg mb-2 bg-white shadow">
+            <p class="mb-2">{{ $notification->message }}</p>
+            @if($notification->task)
+                <p class="text-sm text-gray-600">Tâche: {{ $notification->task->title }}</p>
+            @endif
+            @if($notification->employee)
+                <p class="text-sm text-gray-600">Employé: {{ $notification->employee->name }}</p>
+            @endif
+            <small class="text-gray-500">
+                Ajoutée le {{ $notification->created_at->format('d/m/Y à H:i') }}
+            </small>
+        </div>
+    @empty
+        <p>Aucune notification pour le moment.</p>
+    @endforelse
 </div>
-
-    </x-filament::section>
-</x-filament-widgets::widget>

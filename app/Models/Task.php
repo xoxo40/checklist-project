@@ -15,6 +15,8 @@ class Task extends Model
         'name_employee',
         'task_details',        // Détails de la tâche
         'date',                 // Date associée à la tâche
+        'deadline',
+        'recurrence',
     ];
 
     /**

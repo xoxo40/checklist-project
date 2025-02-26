@@ -17,9 +17,10 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-
+use Filament\Facades\Filament;
 use App\Filament\Employee\Resources\DashboardResource\Widgets\CalendarWidget;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
+use App\Filament\Employee\Widgets\TaskNotificationWidget; 
 
 class EmployeePanelProvider extends PanelProvider
 {
@@ -32,6 +33,7 @@ class EmployeePanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Red,
             ])
+            ->favicon(asset('images/log.jpg'))
             ->discoverResources(in: app_path('Filament/Employee/Resources'), for: 'App\\Filament\\Employee\\Resources')
             ->discoverPages(in: app_path('Filament/Employee/Pages'), for: 'App\\Filament\\Employee\\Pages')
             ->pages([
@@ -40,6 +42,7 @@ class EmployeePanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Employee/Widgets'), for: 'App\\Filament\\Employee\\Widgets')
             ->widgets([
                 CalendarWidget::class,
+                TaskNotificationWidget::class, // Ajout du Widget de Notification des Tâches
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -56,7 +59,13 @@ class EmployeePanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                new FilamentFullCalendarPlugin(),
+                FilamentFullCalendarPlugin::make()
+                    ->selectable(true)
+                    ->editable(true)
             ]);
+            
+            
+            
+            
     }
 }

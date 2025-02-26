@@ -88,12 +88,12 @@ class TaskResource extends Resource
             ])
             ->filters([])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\DeleteAction::make(),
+               
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                
             ]);
     }
 
@@ -101,10 +101,17 @@ class TaskResource extends Resource
     {
         return [
             'index' => Pages\ListTasks::route('/'),
-            'create' => Pages\CreateTask::route('/create'),
+            //'create' => Pages\CreateTask::route('/create'),
             'edit' => Pages\EditTask::route('/{record}/edit'),
         ];
     }
+
+
+    public static function canCreate(): bool
+{
+    return false; // Désactive l'action "Créer"
+}
+
 
     public static function getNavigationBadge(): ?string
     {

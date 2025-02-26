@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('checklist_id')->constrained('checklists'); // Foreign key vers checklists(id)
             $table->string('task_details');
             $table->date('date');
+            $table->date('deadline');
+            $table->string('recurrence')->nullable()->change();
             $table->timestamps();
         });
     }

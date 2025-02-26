@@ -3,14 +3,18 @@
 namespace App\Filament\Widgets;
 
 use Filament\Widgets\Widget;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Notification;
 
 class NotificationWidget extends Widget
 {
-    protected static string $view = 'filament.widgets.notification-widget'; // Chemin de la vue
-
+    protected static string $view = 'filament.widgets.notification-widget';
+    
     public function getNotifications()
     {
-        return Auth::user()->notifications; // Récupère les notifications de l'utilisateur authentifié
+        return Notification::with(['usertask', 'employee'])
+            ->where('is_read', false)
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
-} 
+}
+

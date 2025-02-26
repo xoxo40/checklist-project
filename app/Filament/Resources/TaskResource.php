@@ -47,9 +47,32 @@ class TaskResource extends Resource
                     ->rows(6)
                     ->required(),
 
+                    Forms\Components\Select::make('recurrence')
+                    ->label('Récurrence (optionnelle)')
+                    ->options([
+                        'lundi' => 'Lundi',
+                        'mardi' => 'Mardi',
+                        'mercredi' => 'Mercredi',
+                        'jeudi' => 'Jeudi',
+                        'vendredi' => 'Vendredi',
+                        'samedi' => 'Samedi',
+                        'dimanche' => 'Dimanche',
+                    ])
+                    ->placeholder('Aucune récurrence')
+                    ->reactive() // Rendre réactif pour surveiller les changements
+                    ->nullable()
+                    ->helperText('Sélectionnez un jour si la tâche doit être répétée automatiquement chaque jour de la semaine.'),
+    
                 Forms\Components\DatePicker::make('date')
-                    ->label('Date de la Tâche')
-                    ->required(),
+                    ->label('Date de démarrage')
+                    ->required()
+                    ->disabled(fn (callable $get) => $get('recurrence') !== null), // Désactiver si une récurrence est sélectionnée
+    
+                Forms\Components\DatePicker::make('deadline')
+                    ->label('Date d\'échéance')
+                    ->required()
+                    ->disabled(fn (callable $get) => $get('recurrence') !== null), // Désactiver si une récurrence est sélectionnée
+                
             ]);
     }
 
@@ -77,14 +100,39 @@ class TaskResource extends Resource
                     ->html(), // Activez l'HTML pour permettre l'affichage des cases à cocher
 
                 Tables\Columns\TextColumn::make('date')
-                    ->label('Date')
+                    ->label('Date de démarrage')
                     ->date(),
+
+                Tables\Columns\TextColumn::make('deadline')
+                    ->label(" Dta d'échéance")
+                    ->date(),  
+                    
+                Tables\Columns\TextColumn::make('recurrence')
+                    ->label('Récurrence')
+                    ->sortable()
+                    ->formatStateUsing(function ($state) {
+                        $days = [
+                            'lundi' => 'Lundi',
+                            'mardi' => 'Mardi',
+                            'mercredi' => 'Mercredi',
+                            'jeudi' => 'Jeudi',
+                            'vendredi' => 'Vendredi',
+                            'samedi' => 'Samedi',
+                            'dimanche' => 'Dimanche',
+                        ];
+                
+                        return $days[$state] ?? $state; // Retourne le jour ou la valeur brute si non trouvée
+                    })
+                    ->visible(fn($record) => $record && !is_null($record->recurrence)),
+                
+                
             ])
             ->filters([])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),])
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

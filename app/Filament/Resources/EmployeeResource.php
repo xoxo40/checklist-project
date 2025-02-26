@@ -33,7 +33,8 @@ class EmployeeResource extends Resource
                     ->label('Email')
                     ->email()
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->rule('regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/'),
 
                 Forms\Components\TextInput::make('password')
                     ->label('Password')
